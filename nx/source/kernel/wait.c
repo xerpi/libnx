@@ -64,7 +64,7 @@ static Result _waitObjectsImpl(s32* idx_out, const Waiter* objects, u32 num_obje
                 }
 
                 // Add (fake) handle to the array.
-                waiters_added |= 1UL << i;
+                waiters_added |= BITL(i);
                 handles[i] = dummy_handle;
                 break;
         }
@@ -110,7 +110,7 @@ static Result _waitObjectsImpl(s32* idx_out, const Waiter* objects, u32 num_obje
 clean_up:
     // Remove listeners.
     for (i = 0; i < num_objects; i ++)
-        if (waiters_added & (1UL << i))
+        if (waiters_added & BITL(i))
             _waiterNodeRemove(&waiters[i]);
 
     return rc;

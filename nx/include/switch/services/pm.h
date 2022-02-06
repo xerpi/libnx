@@ -35,7 +35,7 @@ typedef enum {
 } PmLaunchFlag;
 
 /// ProcessEvent
-typedef enum {
+typedef enum : u32 {
     PmProcessEvent_None = 0,
     PmProcessEvent_Exit = 1,
     PmProcessEvent_Start = 2,
@@ -51,7 +51,7 @@ typedef struct {
 } PmProcessEventInfo;
 
 /// BootMode
-typedef enum {
+typedef enum : u32 {
     PmBootMode_Normal      = 0,    ///< Normal
     PmBootMode_Maintenance = 1,    ///< Maintenance
     PmBootMode_SafeMode    = 2,    ///< SafeMode

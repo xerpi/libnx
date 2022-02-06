@@ -9,7 +9,7 @@
 #include "../kernel/event.h"
 #include "../sf/service.h"
 
-typedef enum {
+typedef enum : u32 {
     PscPmState_Awake = 0,               ///< Everything is awake.
     PscPmState_ReadyAwaken = 1,         ///< Preparing to transition to awake.
     PscPmState_ReadySleep = 2,          ///< Preparing to transition to sleep.
@@ -18,7 +18,7 @@ typedef enum {
     PscPmState_ReadyShutdown = 5,       ///< Preparing to transition to shutdown.
 } PscPmState;
 
-typedef enum {
+typedef enum : u32 {
     PscPmModuleId_Usb           = 4,
     PscPmModuleId_Ethernet      = 5,
     PscPmModuleId_Fgm           = 6,

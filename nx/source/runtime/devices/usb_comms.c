@@ -414,13 +414,13 @@ static Result _usbCommsRead(usbCommsInterface *interface, void* buffer, size_t s
 
     while(size)
     {
-        if(((u64)bufptr) & 0xfff)//When bufptr isn't page-aligned copy the data into g_usbComms_endpoint_in_buffer and transfer that, otherwise use the bufptr directly.
+        if(((uintptr_t)bufptr) & 0xfff)//When bufptr isn't page-aligned copy the data into g_usbComms_endpoint_in_buffer and transfer that, otherwise use the bufptr directly.
         {
             transfer_buffer = interface->endpoint_out_buffer;
             memset(interface->endpoint_out_buffer, 0, 0x1000);
 
             chunksize = 0x1000;
-            chunksize-= ((u64)bufptr) & 0xfff;//After this transfer, bufptr will be page-aligned(if size is large enough for another transfer).
+            chunksize-= ((uintptr_t)bufptr) & 0xfff;//After this transfer, bufptr will be page-aligned(if size is large enough for another transfer).
             if (size<chunksize) chunksize = size;
 
             transfer_type = 0;
@@ -501,13 +501,13 @@ static Result _usbCommsWrite(usbCommsInterface *interface, const void* buffer, s
 
     while(size)
     {
-        if(((u64)bufptr) & 0xfff)//When bufptr isn't page-aligned copy the data into g_usbComms_endpoint_in_buffer and transfer that, otherwise use the bufptr directly.
+        if(((uintptr_t)bufptr) & 0xfff)//When bufptr isn't page-aligned copy the data into g_usbComms_endpoint_in_buffer and transfer that, otherwise use the bufptr directly.
         {
             transfer_buffer = interface->endpoint_in_buffer;
             memset(interface->endpoint_in_buffer, 0, 0x1000);
 
             chunksize = 0x1000;
-            chunksize-= ((u64)bufptr) & 0xfff;//After this transfer, bufptr will be page-aligned(if size is large enough for another transfer).
+            chunksize-= ((uintptr_t)bufptr) & 0xfff;//After this transfer, bufptr will be page-aligned(if size is large enough for another transfer).
             if (size<chunksize) chunksize = size;
 
             memcpy(interface->endpoint_in_buffer, bufptr, chunksize);

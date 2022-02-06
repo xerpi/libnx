@@ -27,21 +27,44 @@ NX_INLINE void* _dynResolveOffset(const Mod0Header* mod0, s32 offset)
 	return (void*)((uintptr_t)mod0 + offset);
 }
 
-static void _dynProcessRela(uintptr_t base, const Elf64_Rela* rela, size_t relasz)
+#ifdef __ARM_ARCH_ISA_A64
+#define uXX           u64
+#define ElfXX_Dyn     Elf64_Dyn
+#define ElfXX_Rela    Elf64_Rela
+#define ElfXX_Relr    Elf64_Relr
+#define ELFXX_R_TYPE  ELF64_R_TYPE
+#define R_XX_NONE     R_AARCH64_NONE
+#define R_XX_RELATIVE R_AARCH64_RELATIVE
+#else
+#ifndef DT_RELR
+#define DT_RELRSZ 	35    	/* Total size of RELR relative relocations */
+#define DT_RELR		36		/* Address of RELR relative relocations */
+typedef Elf32_Word Elf32_Relr;
+#endif
+#define uXX           u32
+#define ElfXX_Dyn     Elf32_Dyn
+#define ElfXX_Rela    Elf32_Rela
+#define ElfXX_Relr    Elf32_Relr
+#define ELFXX_R_TYPE  ELF32_R_TYPE
+#define R_XX_NONE     R_ARM_NONE
+#define R_XX_RELATIVE R_ARM_RELATIVE
+#endif
+
+static void _dynProcessRela(uintptr_t base, const ElfXX_Rela* rela, size_t relasz)
 {
 	for (; relasz--; rela++) {
-		switch (ELF64_R_TYPE(rela->r_info)) {
+		switch (ELFXX_R_TYPE(rela->r_info)) {
 			default: {
 				diagAbortWithResult(MAKERESULT(Module_Libnx, LibnxError_BadReloc));
 				break;
 			}
 
-			case R_AARCH64_NONE: {
+			case R_XX_NONE: {
 				break;
 			}
 
-			case R_AARCH64_RELATIVE: {
-				u64* ptr = (u64*)(base + rela->r_offset);
+			case R_XX_RELATIVE: {
+				uXX* ptr = (uXX*)(base + rela->r_offset);
 				*ptr = base + rela->r_addend;
 				break;
 			}
@@ -49,21 +72,21 @@ static void _dynProcessRela(uintptr_t base, const Elf64_Rela* rela, size_t relas
 	}
 }
 
-static void _dynProcessRelr(uintptr_t base, const Elf64_Relr* relr, size_t relrsz)
+static void _dynProcessRelr(uintptr_t base, const ElfXX_Relr* relr, size_t relrsz)
 {
-	u64* ptr = NULL;
+	uXX* ptr = NULL;
 	for (; relrsz--; relr++) {
 		if ((*relr & 1) == 0) {
-			ptr = (u64*)(base + *relr);
+			ptr = (uXX*)(base + *relr);
 			*ptr++ += base;
 		} else {
-			u64 bitmap = *relr >> 1;
+			uXX bitmap = *relr >> 1;
 			while (bitmap) {
 				unsigned id = __builtin_ffsl(bitmap)-1;
 				bitmap &= ~(1UL << id);
 				ptr[id] += base;
 			}
-			ptr += 63;
+			ptr += sizeof(uXX) * 8 - 1;
 		}
 	}
 }
@@ -83,29 +106,29 @@ void __nx_dynamic(uintptr_t base, const Mod0Header* mod0)
 	}
 
 	// Retrieve pointer to the ELF dynamic section
-	const Elf64_Dyn* dyn = _dynResolveOffset(mod0, mod0->dyn_offset);
+	const ElfXX_Dyn* dyn = _dynResolveOffset(mod0, mod0->dyn_offset);
 
 	// Extract relevant information from the ELF dynamic section
-	const Elf64_Rela* rela = NULL;
+	const ElfXX_Rela* rela = NULL;
 	size_t relasz = 0;
-	const Elf64_Relr* relr = NULL;
+	const ElfXX_Relr* relr = NULL;
 	size_t relrsz = 0;
 	for (; dyn->d_tag != DT_NULL; dyn++) {
 		switch (dyn->d_tag) {
 			case DT_RELA:
-				rela = (const Elf64_Rela*)(base + dyn->d_un.d_ptr);
+				rela = (const void*)(base + dyn->d_un.d_ptr);
 				break;
 
 			case DT_RELASZ:
-				relasz = dyn->d_un.d_val / sizeof(Elf64_Rela);
+				relasz = dyn->d_un.d_val / sizeof(ElfXX_Rela);
 				break;
 
 			case DT_RELR:
-				relr = (const Elf64_Relr*)(base + dyn->d_un.d_ptr);
+				relr = (const ElfXX_Relr*)(base + dyn->d_un.d_ptr);
 				break;
 
 			case DT_RELRSZ:
-				relrsz = dyn->d_un.d_val / sizeof(Elf64_Relr);
+				relrsz = dyn->d_un.d_val / sizeof(ElfXX_Relr);
 				break;
 		}
 	}

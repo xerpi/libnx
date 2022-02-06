@@ -109,8 +109,13 @@ NX_CONSTEXPR HipcStaticDescriptor hipcMakeSendStatic(const void* buffer, size_t 
 {
     return (HipcStaticDescriptor){
         .index        = index,
+#ifdef __ARM_ARCH_ISA_A64
         .address_high = (u32)((uintptr_t)buffer >> 36),
         .address_mid  = (u32)((uintptr_t)buffer >> 32),
+#else
+        .address_high = 0,
+        .address_mid  = 0,
+#endif
         .size         = (u32)size,
         .address_low  = (u32)(uintptr_t)buffer,
     };
@@ -122,9 +127,15 @@ NX_CONSTEXPR HipcBufferDescriptor hipcMakeBuffer(const void* buffer, size_t size
         .size_low     = (u32)size,
         .address_low  = (u32)(uintptr_t)buffer,
         .mode         = mode,
+#ifdef __ARM_ARCH_ISA_A64
         .address_high = (u32)((uintptr_t)buffer >> 36),
         .size_high    = (u32)(size >> 32),
         .address_mid  = (u32)((uintptr_t)buffer >> 32),
+#else
+        .address_high = 0,
+        .size_high    = 0,
+        .address_mid  = 0,
+#endif
     };
 }
 
@@ -132,14 +143,22 @@ NX_CONSTEXPR HipcRecvListEntry hipcMakeRecvStatic(void* buffer, size_t size)
 {
     return (HipcRecvListEntry){
         .address_low  = (u32)((uintptr_t)buffer),
+#ifdef __ARM_ARCH_ISA_A64
         .address_high = (u32)((uintptr_t)buffer >> 32),
+#else
+        .address_high = 0,
+#endif
         .size         = (u32)size,
     };
 }
 
 NX_CONSTEXPR void* hipcGetStaticAddress(const HipcStaticDescriptor* desc)
 {
-    return (void*)(desc->address_low | ((uintptr_t)desc->address_mid << 32) | ((uintptr_t)desc->address_high << 36));
+    return (void*)(desc->address_low
+#ifdef __ARM_ARCH_ISA_A64
+	| ((uintptr_t)desc->address_mid << 32) | ((uintptr_t)desc->address_high << 36)
+#endif
+	);
 }
 
 NX_CONSTEXPR size_t hipcGetStaticSize(const HipcStaticDescriptor* desc)
@@ -149,12 +168,20 @@ NX_CONSTEXPR size_t hipcGetStaticSize(const HipcStaticDescriptor* desc)
 
 NX_CONSTEXPR void* hipcGetBufferAddress(const HipcBufferDescriptor* desc)
 {
-    return (void*)(desc->address_low | ((uintptr_t)desc->address_mid << 32) | ((uintptr_t)desc->address_high << 36));
+    return (void*)(desc->address_low
+#ifdef __ARM_ARCH_ISA_A64
+	| ((uintptr_t)desc->address_mid << 32) | ((uintptr_t)desc->address_high << 36)
+#endif
+	);
 }
 
 NX_CONSTEXPR size_t hipcGetBufferSize(const HipcBufferDescriptor* desc)
 {
-    return desc->size_low | ((size_t)desc->size_high << 32);
+    return desc->size_low
+#ifdef __ARM_ARCH_ISA_A64
+	| ((size_t)desc->size_high << 32);
+#endif
+	;
 }
 
 NX_CONSTEXPR HipcRequest hipcCalcRequestLayout(HipcMetadata meta, void* base)

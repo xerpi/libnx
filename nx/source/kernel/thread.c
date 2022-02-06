@@ -63,12 +63,12 @@ void __libnx_init_thread(void) {
 
     MemoryInfo mem_info = {0};
     u32 page_info;
-    svcQueryMemory(&mem_info, &page_info, (u64)(&mem_info));
+    svcQueryMemory(&mem_info, &page_info, (uintptr_t)&mem_info);
 
     // Set stack.
     g_mainThread.owns_stack_mem = false;
     g_mainThread.stack_mem      = NULL;
-    g_mainThread.stack_mirror   = (void*)mem_info.addr;
+    g_mainThread.stack_mirror   = (void*)(uintptr_t)mem_info.addr;
     g_mainThread.stack_sz       = mem_info.size;
 
     // Set the TLS array.

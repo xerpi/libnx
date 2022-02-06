@@ -116,7 +116,7 @@ Result nvioctlNvhostCtrlGpu_GetTpcMasks(u32 fd, void *buffer, size_t size) {
 
     memset(&data, 0, sizeof(data));
     data.bufsize = size;
-    data.bufaddr = (u64)buffer;
+    data.bufaddr = (u64)(uintptr_t)buffer;
 
     rc = nvIoctl(fd, _NV_IOWR(0x47, 0x06, data), &data);
 

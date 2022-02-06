@@ -9,7 +9,7 @@
 #include "../types.h"
 #include "../sf/service.h"
 
-typedef enum {
+typedef enum : u32 {
     MmuModuleId_Ram   = 2,
     MmuModuleId_Nvenc = 5,
     MmuModuleId_Nvdec = 6,

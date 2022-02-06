@@ -176,7 +176,7 @@ Result nwindowConfigureBuffer(NWindow* nw, s32 slot, NvGraphicBuffer* buf)
 
     mutexLock(&nw->mutex);
 
-    if (nw->slots_configured & (1UL << slot)) {
+    if (nw->slots_configured & BITL(slot)) {
         mutexUnlock(&nw->mutex);
         return MAKERESULT(Module_Libnx, LibnxError_AlreadyInitialized);
     }
@@ -209,7 +209,7 @@ Result nwindowConfigureBuffer(NWindow* nw, s32 slot, NvGraphicBuffer* buf)
 
     Result rc = bqSetPreallocatedBuffer(&nw->bq, slot, &bqbuf);
     if (R_SUCCEEDED(rc))
-        nw->slots_configured |= 1UL << slot;
+        nw->slots_configured |= BITL(slot);
 
     mutexUnlock(&nw->mutex);
     return rc;
@@ -243,12 +243,12 @@ Result nwindowDequeueBuffer(NWindow* nw, s32* out_slot, NvMultiFence* out_fence)
         rc = bqDequeueBuffer(&nw->bq, false, nw->width, nw->height, nw->format, nw->usage, &slot, &fence);
 
     if (R_SUCCEEDED(rc)) {
-        if (!(nw->slots_requested & (1UL << slot))) {
+        if (!(nw->slots_requested & BITL(slot))) {
             rc = bqRequestBuffer(&nw->bq, slot, NULL);
             if (R_FAILED(rc))
                 bqCancelBuffer(&nw->bq, slot, &fence);
             else
-                nw->slots_requested |= 1UL << slot;
+                nw->slots_requested |= BITL(slot);
         }
     }
 

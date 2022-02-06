@@ -300,7 +300,7 @@ typedef enum {
  * @return Result code.
  * @note Syscall number 0x01.
  */
-Result svcSetHeapSize(void** out_addr, u64 size);
+Result svcSetHeapSize(void** out_addr, size_t size);
 
 /**
  * @brief Set the memory permissions of a (page-aligned) range of memory.
@@ -312,19 +312,19 @@ Result svcSetHeapSize(void** out_addr, u64 size);
  *         This can be used to move back and forth between Perm_None, Perm_R and Perm_Rw.
  * @note Syscall number 0x02.
  */
-Result svcSetMemoryPermission(void* addr, u64 size, u32 perm);
+Result svcSetMemoryPermission(void* addr, size_t size, u32 perm);
 
 /**
  * @brief Set the memory attributes of a (page-aligned) range of memory.
  * @param[in] addr Start address of the range.
  * @param[in] size Size of the range, in bytes.
- * @param[in] val0 State0
- * @param[in] val1 State1
+ * @param[in] mask Mask
+ * @param[in] attr Attribute
  * @return Result code.
  * @remark See <a href="https://switchbrew.org/wiki/SVC#svcSetMemoryAttribute">switchbrew.org Wiki</a> for more details.
  * @note Syscall number 0x03.
  */
-Result svcSetMemoryAttribute(void* addr, u64 size, u32 val0, u32 val1);
+Result svcSetMemoryAttribute(void* addr, size_t size, u32 mask, u32 attr);
 
 /**
  * @brief Maps a memory range into a different range. Mainly used for adding guard pages around stack.
@@ -335,7 +335,7 @@ Result svcSetMemoryAttribute(void* addr, u64 size, u32 val0, u32 val1);
  * @return Result code.
  * @note Syscall number 0x04.
  */
-Result svcMapMemory(void* dst_addr, void* src_addr, u64 size);
+Result svcMapMemory(void* dst_addr, void* src_addr, size_t size);
 
 /**
  * @brief Unmaps a region that was previously mapped with \ref svcMapMemory.
@@ -345,7 +345,7 @@ Result svcMapMemory(void* dst_addr, void* src_addr, u64 size);
  * @return Result code.
  * @note Syscall number 0x05.
  */
-Result svcUnmapMemory(void* dst_addr, void* src_addr, u64 size);
+Result svcUnmapMemory(void* dst_addr, void* src_addr, size_t size);
 
 /**
  * @brief Query information about an address. Will always fetch the lowest page-aligned mapping that contains the provided address.
@@ -355,7 +355,7 @@ Result svcUnmapMemory(void* dst_addr, void* src_addr, u64 size);
  * @return Result code.
  * @note Syscall number 0x06.
  */
-Result svcQueryMemory(MemoryInfo* meminfo_ptr, u32 *pageinfo, u64 addr);
+Result svcQueryMemory(MemoryInfo* meminfo_ptr, u32 *pageinfo, uintptr_t addr);
 
 ///@}
 
@@ -605,7 +605,7 @@ Result svcSendSyncRequest(Handle session);
  * @remark size must be allocated to 0x1000 bytes.
  * @note Syscall number 0x22.
  */
-Result svcSendSyncRequestWithUserBuffer(void* usrBuffer, u64 size, Handle session);
+Result svcSendSyncRequestWithUserBuffer(void* usrBuffer, size_t size, Handle session);
 
 /**
  * @brief Sends an IPC synchronization request to a session from an user allocated buffer (asynchronous version).
@@ -613,7 +613,7 @@ Result svcSendSyncRequestWithUserBuffer(void* usrBuffer, u64 size, Handle sessio
  * @remark size must be allocated to 0x1000 bytes.
  * @note Syscall number 0x23.
  */
-Result svcSendAsyncRequestWithUserBuffer(Handle* handle, void* usrBuffer, u64 size, Handle session);
+Result svcSendAsyncRequestWithUserBuffer(Handle* handle, void* usrBuffer, size_t size, Handle session);
 
 ///@}
 
@@ -661,7 +661,7 @@ Result svcBreak(u32 breakReason, uintptr_t address, uintptr_t size);
  * @return Result code.
  * @note Syscall number 0x27.
  */
-Result svcOutputDebugString(const char *str, u64 size);
+Result svcOutputDebugString(const char *str, size_t size);
 
 ///@}
 
@@ -1018,7 +1018,7 @@ Result svcSetUnsafeLimit(u64 size);
  * @note Syscall number 0x4B.
  * @warning This is a privileged syscall. Use \ref envIsSyscallHinted to check if it is available.
  */
-Result svcCreateCodeMemory(Handle* code_handle, void* src_addr, u64 size);
+Result svcCreateCodeMemory(Handle* code_handle, void* src_addr, size_t size);
 
 /**
  * @brief Maps code memory in the caller's address space [4.0.0+].
@@ -1026,7 +1026,7 @@ Result svcCreateCodeMemory(Handle* code_handle, void* src_addr, u64 size);
  * @note Syscall number 0x4C.
  * @warning This is a privileged syscall. Use \ref envIsSyscallHinted to check if it is available.
  */
-Result svcControlCodeMemory(Handle code_handle, CodeMapOperation op, void* dst_addr, u64 size, u64 perm);
+Result svcControlCodeMemory(Handle code_handle, u32 op, u64 dst_addr, u64 size, u32 perm);
 
 ///@}
 
@@ -1210,7 +1210,7 @@ Result svcUnmapDeviceAddressSpace(Handle handle, Handle proc_handle, u64 map_add
  * @note Syscall number 0x5D.
  * @warning This is a privileged syscall. Use \ref envIsSyscallHinted to check if it is available.
  */
-Result svcInvalidateProcessDataCache(Handle process, uintptr_t address, size_t size);
+Result svcInvalidateProcessDataCache(Handle process, uint64_t address, uint64_t size);
 
 /**
  * @brief Stores data cache for a virtual address range within a process.
@@ -1219,7 +1219,7 @@ Result svcInvalidateProcessDataCache(Handle process, uintptr_t address, size_t s
  * @note Syscall number 0x5E.
  * @warning This is a privileged syscall. Use \ref envIsSyscallHinted to check if it is available.
  */
-Result svcStoreProcessDataCache(Handle process, uintptr_t address, size_t size);
+Result svcStoreProcessDataCache(Handle process, uint64_t address, uint64_t size);
 
 /**
  * @brief Flushes data cache for a virtual address range within a process.
@@ -1228,7 +1228,7 @@ Result svcStoreProcessDataCache(Handle process, uintptr_t address, size_t size);
  * @note Syscall number 0x5F.
  * @warning This is a privileged syscall. Use \ref envIsSyscallHinted to check if it is available.
  */
-Result svcFlushProcessDataCache(Handle process, uintptr_t address, size_t size);
+Result svcFlushProcessDataCache(Handle process, uint64_t address, uint64_t size);
 
 ///@}
 

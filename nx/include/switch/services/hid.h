@@ -1534,7 +1534,7 @@ size_t hidGetKeyboardStates(HidKeyboardState *states, size_t count);
  * @return true if the key is pressed, false if not.
  */
 NX_CONSTEXPR bool hidKeyboardStateGetKey(const HidKeyboardState *state, HidKeyboardKey key) {
-    return (state->keys[key / 64] & (1UL << (key & 63))) != 0;
+    return (state->keys[key / 64] & (BITL(key & 63))) != 0;
 }
 
 ///@}

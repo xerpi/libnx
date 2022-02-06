@@ -6,10 +6,10 @@ ifeq ($(strip $(DEVKITPRO)),)
 $(error "Please set DEVKITPRO in your environment. export DEVKITPRO=<path to>/devkitpro")
 endif
 
-include $(DEVKITPRO)/devkitA64/base_rules
+include $(DEVKITPRO)/devkitARM/base_rules
 
 export LIBNX_MAJOR	:= 4
-export LIBNX_MINOR	:= 7
+export LIBNX_MINOR	:= 2
 export LIBNX_PATCH	:= 0
 
 
@@ -24,7 +24,7 @@ VERSION	:=	$(LIBNX_MAJOR).$(LIBNX_MINOR).$(LIBNX_PATCH)
 #---------------------------------------------------------------------------------
 TARGET		:=	nx
 #BUILD		:=	build
-SOURCES		:=	source/arm source/kernel source/sf source/services source/crypto source/nvidia source/nvidia/ioctl source/display source/audio source/applets source/runtime source/runtime/devices source/runtime/util source/runtime/util/utf
+SOURCES		:=	source/arm source/kernel source/sf source/services source/nvidia source/nvidia/ioctl source/display source/audio source/applets source/runtime source/runtime/devices source/runtime/util source/runtime/util/utf
 DATA		:=	data
 INCLUDES	:=	include external/bsd/include
 
@@ -64,8 +64,9 @@ export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
 CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
-SFILES		:=	$(filter-out cache32.s svc32.s exception32.s readtp32.s switch32_crt0.s, $(SFILES))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
+
+SFILES		:= $(filter-out cache.s svc.s exception.s readtp.s switch_crt0.s, $(SFILES))
 
 #---------------------------------------------------------------------------------
 # use CXX for linking C++ projects, CC for standard C
@@ -97,16 +98,16 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 all: lib/libnx.a lib/libnxd.a
 
 dist-bin: all
-	@tar --exclude=*~ -cjf libnx-$(VERSION).tar.bz2 include lib default_icon.jpg switch_rules switch.ld switch.specs -C external/bsd include
+	@tar --exclude=*~ -cjf libnx-$(VERSION).tar.bz2 include lib default_icon.jpg switch32_rules switch32.ld switch32.specs -C external/bsd include
 
 dist-src:
-	@tar --exclude=*~ -cjf libnx-src-$(VERSION).tar.bz2 include source data external Makefile default_icon.jpg switch_rules switch.ld switch.specs
+	@tar --exclude=*~ -cjf libnx-src-$(VERSION).tar.bz2 include source data external Makefile default_icon.jpg switch_rules32 switch32.ld switch32.specs
 
 dist: dist-src dist-bin
 
 install: dist-bin
-	mkdir -p $(DESTDIR)$(DEVKITPRO)/libnx
-	bzip2 -cd libnx-$(VERSION).tar.bz2 | tar -xf - -C $(DESTDIR)$(DEVKITPRO)/libnx
+	mkdir -p $(DESTDIR)$(DEVKITPRO)/libnx32
+	bzip2 -cd libnx-$(VERSION).tar.bz2 | tar -xf - -C $(DESTDIR)$(DEVKITPRO)/libnx32
 
 #dox:
 #	@doxygen Doxyfile
@@ -126,14 +127,14 @@ lib/libnx.a : lib release $(SOURCES) $(INCLUDES)
 	BUILD_CFLAGS="-DNDEBUG=1 -O2" \
 	DEPSDIR=$(CURDIR)/release \
 	--no-print-directory -C release \
-	-f $(CURDIR)/Makefile
+	-f $(CURDIR)/Makefile.32
 
 lib/libnxd.a : lib debug $(SOURCES) $(INCLUDES)
 	@$(MAKE) BUILD=debug OUTPUT=$(CURDIR)/$@ \
 	BUILD_CFLAGS="-DDEBUG=1 -Og" \
 	DEPSDIR=$(CURDIR)/debug \
 	--no-print-directory -C debug \
-	-f $(CURDIR)/Makefile
+	-f $(CURDIR)/Makefile.32
 
 #---------------------------------------------------------------------------------
 clean:

@@ -314,7 +314,7 @@ static Result _usbDsPostBuffer(Service* srv, void* buffer, size_t size, u32 *urb
         u32 size;
         u32 padding;
         u64 buffer;
-    } in = { (u32)size, 0, (u64)buffer };
+    } in = { (u32)size, 0, (u64)(uintptr_t)buffer };
 
     serviceAssumeDomain(srv);
     return serviceDispatchInOut(srv, cmd_id, in, *urbId);

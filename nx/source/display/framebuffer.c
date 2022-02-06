@@ -183,13 +183,23 @@ static void _convertGobTo16Bx2(u8* outgob, const u8* ingob, u32 stride)
     // Here, we iterate through each of the 32 sequential swizzled positions and
     // calculate the actual X and Y positions in the unswizzled source image.
     // Since the 'o' bits aren't swizzled, we can copy the whole thing as a single 128-bit unit.
-
+#ifdef __ARM_ARCH_ISA_A64
     for (u32 i = 0; i < 32; i ++) {
         const u32 y = ((i>>1)&0x06) | ( i    &0x01);
         const u32 x = ((i<<3)&0x10) | ((i<<1)&0x20);
         *(u128*)outgob = *(u128*)(ingob + y*stride + x);
         outgob += sizeof(u128);
     }
+#else
+    for (u32 i = 0; i < 32; i ++) {
+        const u32 y = ((i>>1)&0x06) | ( i    &0x01);
+        const u32 x = ((i<<3)&0x10) | ((i<<1)&0x20);
+        *(u64*)outgob = *(u64*)(ingob + y*stride + x);
+        outgob += sizeof(u64);
+        *(u64*)outgob = *(u64*)(ingob + y*stride + x + 8);
+        outgob += sizeof(u64);
+    }
+#endif
 }
 
 static void _convertToBlocklinear(void* outbuf, const void* inbuf, u32 stride, u32 height, u32 block_height_log2)

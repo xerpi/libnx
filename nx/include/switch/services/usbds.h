@@ -158,4 +158,3 @@ Result usbDsEndpoint_Stall(UsbDsEndpoint* endpoint);
 Result usbDsEndpoint_SetZlt(UsbDsEndpoint* endpoint, bool zlt); // Sets Zero Length Termination for endpoint
 
 ///@}
-

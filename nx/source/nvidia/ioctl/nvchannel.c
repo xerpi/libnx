@@ -32,7 +32,7 @@ Result nvioctlChannel_SubmitGpfifo(u32 fd, nvioctl_gpfifo_entry *entries, u32 nu
     } data;
 
     memset(&data, 0, sizeof(data));
-    data.gpfifo = (u64)data.entries; // ignored
+    data.gpfifo = (u64)(uintptr_t)data.entries; // ignored
     data.num_entries = num_entries;
     data.flags = flags;
     data.fence = *fence_inout;
@@ -58,7 +58,7 @@ Result nvioctlChannel_KickoffPb(u32 fd, nvioctl_gpfifo_entry *entries, u32 num_e
     } data;
 
     memset(&data, 0, sizeof(data));
-    data.gpfifo = (u64)entries; // ignored?
+    data.gpfifo = (u64)(uintptr_t)entries; // ignored?
     data.num_entries = num_entries;
     data.flags = flags;
     data.fence = *fence_inout;
@@ -192,7 +192,7 @@ Result nvioctlChannel_SetUserData(u32 fd, void* addr) {
     } data;
 
     memset(&data, 0, sizeof(data));
-    data.addr = (u64)addr;
+    data.addr = (u64)(uintptr_t)addr;
 
     return nvIoctl(fd, _NV_IOW(0x47, 0x14, data), &data);
 }

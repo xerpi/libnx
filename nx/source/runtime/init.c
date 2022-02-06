@@ -65,7 +65,7 @@ void __attribute__((weak)) __libnx_initheap(void)
 {
     void*  addr;
     size_t size = 0;
-    size_t mem_available = 0, mem_used = 0;
+    u64 mem_available = 0, mem_used = 0;
 
     if (envHasHeapOverride()) {
         addr = envGetHeapOverrideAddr();

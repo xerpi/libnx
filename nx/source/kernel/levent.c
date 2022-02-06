@@ -13,13 +13,21 @@
 
 NX_INLINE u32 _LoadExclusive(u32 *ptr) {
     u32 value;
+#ifdef __ARM_ARCH_ISA_A64
     __asm__ __volatile__("ldaxr %w[value], %[ptr]" : [value]"=&r"(value) : [ptr]"Q"(*ptr) : "memory");
+#else
+    __asm__ __volatile__("ldrex %r[value], %[ptr]" : [value]"=&r"(value) : [ptr]"Q"(*ptr) : "memory");
+#endif
     return value;
 }
 
 NX_INLINE bool _StoreExclusive(u32 *ptr, u32 value) {
     u32 result;
+#ifdef __ARM_ARCH_ISA_A64
     __asm__ __volatile__("stlxr %w[result], %w[value], %[ptr]" : [result]"=&r"(result) : [value]"r"(value), [ptr]"Q"(*ptr) : "memory");
+#else
+    __asm__ __volatile__("strex %r[result], %r[value], %[ptr]" : [result]"=&r"(result) : [value]"r"(value), [ptr]"Q"(*ptr) : "memory");
+#endif
     return result != 0;
 }
 

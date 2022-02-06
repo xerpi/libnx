@@ -9,7 +9,7 @@
 #include "../sf/service.h"
 #include "../kernel/event.h"
 
-typedef enum {
+typedef enum : u32 {
     PsmChargerType_Unconnected = 0,  ///< No charger
     PsmChargerType_EnoughPower = 1,  ///< Full supported power
     PsmChargerType_LowPower = 2,     ///< Lower power supported USB-PD mode

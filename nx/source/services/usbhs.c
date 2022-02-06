@@ -288,7 +288,7 @@ static Result _usbHsIfCtrlXferAsync(UsbHsClientIfSession* s, u8 bmRequestType, u
         u16 wIndex;
         u16 wLength;
         u64 buffer;
-    } in = { bmRequestType, bRequest, wValue, wIndex, wLength, (u64)buffer };
+    } in = { bmRequestType, bRequest, wValue, wIndex, wLength, (u64)(uintptr_t)buffer };
 
     serviceAssumeDomain(&s->s);
     return serviceDispatchIn(&s->s, 5, in);
@@ -409,7 +409,7 @@ Result usbHsEpPostBufferAsync(UsbHsClientEpSession* s, void* buffer, u32 size, u
         u32 pad;
         u64 buffer;
         u64 id;
-    } in = { size, 0, (u64)buffer, id };
+    } in = { size, 0, (u64)(uintptr_t)buffer, id };
 
     serviceAssumeDomain(&s->s);
     return serviceDispatchInOut(&s->s, 4, in, *xferId);
@@ -491,7 +491,7 @@ Result usbHsEpBatchBufferAsync(UsbHsClientEpSession* s, void* buffer, u32* urbs,
         u32 pad;
         u64 buffer;
         u64 id;
-    } in = { urbCount, unk1, unk2, 0, (u64)buffer, id };
+    } in = { urbCount, unk1, unk2, 0, (u64)(uintptr_t)buffer, id };
 
     serviceAssumeDomain(&s->s);
     return serviceDispatchInOut(&s->s, 6, in, *xferId,
@@ -508,7 +508,7 @@ Result usbHsEpCreateSmmuSpace(UsbHsClientEpSession* s, void* buffer, u32 size) {
         u32 size;
         u32 pad;
         u64 buffer;
-    } in = { size, 0, (u64)buffer };
+    } in = { size, 0, (u64)(uintptr_t)buffer };
 
     serviceAssumeDomain(&s->s);
     return serviceDispatchIn(&s->s, 7, in);

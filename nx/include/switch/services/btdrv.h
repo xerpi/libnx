@@ -84,7 +84,7 @@ typedef struct {
                     u8 pad;                                 ///< Padding
                     s32 passkey;                            ///< Passkey
                 } v12;                                      ///< [12.0.0+]
-            };  
+            }; 
         } ssp_request;                                      ///< ::BtdrvEventType_SspRequest
 
         struct {
@@ -1571,4 +1571,3 @@ void* btdrvCircularBufferRead(BtdrvCircularBuffer *c);
 bool btdrvCircularBufferFree(BtdrvCircularBuffer *c);
 
 ///@}
-

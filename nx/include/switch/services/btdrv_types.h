@@ -26,7 +26,7 @@ typedef enum {
 } BtdrvAdapterPropertyType;
 
 /// EventType
-typedef enum {
+typedef enum : u32 {
     ///< BtdrvEventType_* should be used on [12.0.0+]
     BtdrvEventType_InquiryDevice                 =     0,    ///< Device found during Inquiry.
     BtdrvEventType_InquiryStatus                 =     1,    ///< Inquiry status changed.
@@ -50,7 +50,7 @@ typedef enum {
     BtdrvEventTypeOld_BluetoothCrash             =    13,    ///< BluetoothCrash
 } BtdrvEventType;
 
-/// BtdrvInquiryStatus 
+/// BtdrvInquiryStatus
 typedef enum {
     BtdrvInquiryStatus_Stopped                   =     0,    ///< Inquiry stopped.
     BtdrvInquiryStatus_Started                   =     1,    ///< Inquiry started.
@@ -124,7 +124,7 @@ typedef enum {
 } BtdrvFatalReason;
 
 /// BleEventType
-typedef enum {
+typedef enum : u32 {
     BtdrvBleEventType_ClientRegistration            =    0,    ///< GATT client registration.
     BtdrvBleEventType_ServerRegistration            =    1,    ///< GATT server registration.
     BtdrvBleEventType_ConnectionUpdate              =    2,    ///< Connection update.
@@ -281,7 +281,7 @@ typedef struct {
 /// BtdrvPinCode [12.0.0+]
 typedef struct {
     char code[0x10];           ///< PinCode
-    u8 length;                 ///< Length 
+    u8 length;                 ///< Length
 } BtdrvPinCode;
 
 /// HidData [1.0.0-8.1.1]
@@ -452,4 +452,3 @@ typedef struct {
 typedef struct {
     u8 unk_x0[0x10];                        ///< Unknown
 } BtdrvAudioControlButtonState;
-

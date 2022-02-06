@@ -119,14 +119,14 @@ Result tmemWaitForPermission(TransferMemory* t, Permission perm)
     if ((t->perm & perm) != perm) {
         MemoryInfo m = {0};
         u32 p = 0;
-        rc = svcQueryMemory(&m, &p, (u64)(t->src_addr));
+        rc = svcQueryMemory(&m, &p, (uintptr_t)(t->src_addr));
 
         if (R_FAILED(rc)) {
             return rc;
         }
 
         while ((m.perm & perm) != perm) {
-            rc = svcQueryMemory(&m, &p, (u64)(t->src_addr));
+            rc = svcQueryMemory(&m, &p, (uintptr_t)(t->src_addr));
 
             if (R_FAILED(rc)) {
                 return rc;

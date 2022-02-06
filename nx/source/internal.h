@@ -14,13 +14,22 @@ typedef struct {
     Handle handle;
 
     // Pointer to the current thread (if exists)
-    Thread* thread_ptr;
+    union {
+        u64 thread_ptr64;
+        Thread* thread_ptr;
+    };
 
     // Pointer to this thread's newlib state
-    struct _reent* reent;
+    union {
+        u64 reent64;
+        struct _reent* reent;
+    };
 
     // Pointer to this thread's thread-local segment
-    void* tls_tp; // !! Offset needs to be TLS+0x1F8 for __aarch64_read_tp !!
+    union {
+        u64 tls_tp64;
+        void* tls_tp; // !! Offset needs to be TLS+0x1F8 for __aarch64_read_tp and __aeabi_read_tp !!
+    };
 } ThreadVars;
 
 extern const u8 __tdata_lma[];

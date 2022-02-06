@@ -273,7 +273,7 @@ Result btdrvStartInquiry(u32 services, s64 duration) {
         u32 services;
         s64 duration;
     } in = { services, duration };
-    
+
     return serviceDispatchIn(&g_btdrvSrv, 8, in);
 }
 

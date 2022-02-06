@@ -1,0 +1,8 @@
+%rename link                old_link
+
+*link:
+%(old_link) -T %:getenv(DEVKITPRO /libnx32/switch32.ld) -pie --no-dynamic-linker --spare-dynamic-tags=0 --gc-sections -z text --build-id=sha1
+
+*startfile:
+crti%O%s crtbegin%O%s --require-defined=main
+

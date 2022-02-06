@@ -9,7 +9,7 @@
 #include "../kernel/event.h"
 #include "../sf/service.h"
 
-typedef enum {
+typedef enum : u32 {
     GpioPadName_AudioCodec    = 1,
     GpioPadName_ButtonVolUp   = 25,
     GpioPadName_ButtonVolDown = 26,
@@ -20,17 +20,17 @@ typedef struct {
     Service s;
 } GpioPadSession;
 
-typedef enum {
+typedef enum : u32 {
     GpioDirection_Input  = 0,
     GpioDirection_Output = 1,
 } GpioDirection;
 
-typedef enum {
+typedef enum : u32 {
     GpioValue_Low  = 0,
     GpioValue_High = 1,
 } GpioValue;
 
-typedef enum {
+typedef enum : u32 {
     GpioInterruptMode_LowLevel    = 0,
     GpioInterruptMode_HighLevel   = 1,
     GpioInterruptMode_RisingEdge  = 2,
@@ -38,7 +38,7 @@ typedef enum {
     GpioInterruptMode_AnyEdge     = 4,
 } GpioInterruptMode;
 
-typedef enum {
+typedef enum : u32 {
     GpioInterruptStatus_Inactive = 0,
     GpioInterruptStatus_Active   = 1,
 } GpioInterruptStatus;

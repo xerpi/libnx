@@ -174,7 +174,7 @@ typedef enum {
 } AppletScreenShotPermission;
 
 /// Extension values for \ref appletSetIdleTimeDetectionExtension / \ref appletGetIdleTimeDetectionExtension, for extending user inactivity detection.
-typedef enum {
+typedef enum : u32 {
     AppletIdleTimeDetectionExtension_None           = 0,       ///< No extension.
     AppletIdleTimeDetectionExtension_Extended       = 1,       ///< Extended
     AppletIdleTimeDetectionExtension_ExtendedUnsafe = 2,       ///< ExtendedUnsafe

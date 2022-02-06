@@ -208,7 +208,7 @@ enum usb_iso_usage_type {
 };
 
 /// USB Device States, per USB 2.0 spec
-typedef enum {
+typedef enum : u32 {
     UsbState_Detached   = 0, ///< Device is not attached to USB.
     UsbState_Attached   = 1, ///< Device is attached, but is not powered.
     UsbState_Powered    = 2, ///< Device is attached and powered, but has not been reset.

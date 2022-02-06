@@ -53,10 +53,12 @@ static Result _memregionInitWithInfo(MemRegion* r, InfoType id0_addr, InfoType i
     return rc;
 }
 
+#ifdef __ARM_ARCH_ISA_A64
 static void _memregionInitHardcoded(MemRegion* r, uintptr_t start, uintptr_t end) {
     r->start = start;
     r->end   = end;
 }
+#endif
 
 NX_INLINE bool _memregionIsInside(MemRegion* r, uintptr_t start, uintptr_t end) {
     return start >= r->start && end <= r->end;
@@ -182,6 +184,7 @@ void virtmemSetup(void) {
             diagAbortWithResult(MAKERESULT(Module_Libnx, LibnxError_BadGetInfo_Stack));
     }
     else {
+#ifdef __ARM_ARCH_ISA_A64
         // [1.0.0] doesn't expose aslr/stack region information so we have to do this dirty hack to detect it.
         // Forgive me.
         g_IsLegacyKernel = true;
@@ -198,7 +201,9 @@ void virtmemSetup(void) {
             _memregionInitHardcoded(&g_AslrRegion, 0x8000000ull, 0x1000000000ull);
             _memregionInitHardcoded(&g_StackRegion, 0x8000000ull, 0x80000000ull);
         }
-        else {
+        else
+#endif
+        {
             // Wat.
             diagAbortWithResult(MAKERESULT(Module_Libnx, LibnxError_WeirdKernel));
         }

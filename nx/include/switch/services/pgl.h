@@ -20,7 +20,7 @@ typedef enum {
 } PglLaunchFlag;
 
 /// SnapShotDumpType
-typedef enum {
+typedef enum : u32 {
     PglSnapShotDumpType_None = 0,
     PglSnapShotDumpType_Auto = 1,
     PglSnapShotDumpType_Full = 2,
