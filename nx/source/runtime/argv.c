@@ -45,7 +45,7 @@ void __attribute__((weak)) argvSetup(void)
 
     if (envIsNso()) {
         memset(&meminfo, 0, sizeof(meminfo));
-        rc = svcQueryMemory(&meminfo, &pageinfo, (u64)argdata);
+        rc = svcQueryMemory(&meminfo, &pageinfo, (uintptr_t)argdata);
 
         // This memory is only mapped when arguments were passed.
         if (R_FAILED(rc) || meminfo.perm != 0x3)
@@ -57,8 +57,8 @@ void __attribute__((weak)) argvSetup(void)
 
         if (argdata_allocsize==0 || argdata_strsize==0) return;
 
-        if ((u64)argdata < meminfo.addr) return;
-        if (((u64)argdata - meminfo.addr) + argdata_allocsize > meminfo.size) return;
+        if ((uintptr_t)argdata < meminfo.addr) return;
+        if (((uintptr_t)argdata - meminfo.addr) + argdata_allocsize > meminfo.size) return;
 
         argvptr_pos = 0x20 + argdata_strsize+1;
         if (argvptr_pos >= argdata_allocsize) return;

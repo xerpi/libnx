@@ -61,7 +61,7 @@ Result nvioctlNvmap_Alloc(u32 fd, u32 nvmap_handle, u32 heapmask, u32 flags, u32
     data.flags = flags;
     data.align = align;
     data.kind = kind;
-    data.addr = (u64)addr;
+    data.addr = (u64)(uintptr_t)addr;
 
     return nvIoctl(fd, _NV_IOWR(0x01, 0x04, data), &data);
 }

@@ -10,14 +10,18 @@
 
 /// Armv8 CPU register.
 typedef union {
+#ifdef __ARM_ARCH_ISA_A64
     u64 x; ///< 64-bit AArch64 register view.
     u32 w; ///< 32-bit AArch64 register view.
+#endif
     u32 r; ///< AArch32 register view.
 } CpuRegister;
 
 /// Armv8 NEON register.
 typedef union {
+#ifdef __ARM_ARCH_ISA_A64
     u128    v; ///< 128-bit vector view.
+#endif
     double  d; ///< 64-bit double-precision view.
     float   s; ///< 32-bit single-precision view.
 } FpuRegister;
@@ -46,6 +50,7 @@ typedef enum {
 } ThreadExceptionDesc;
 
 /// Thread context structure (register dump)
+#ifdef __ARM_ARCH_ISA_A64
 typedef struct {
     CpuRegister cpu_gprs[29];   ///< GPRs 0..28. Note: also contains AArch32 SPRs.
     u64 fp;                     ///< Frame pointer (x29) (AArch64). For AArch32, check r11.
@@ -60,6 +65,22 @@ typedef struct {
 
     u64         tpidr;          ///< EL0 Read/Write Software Thread ID Register.
 } ThreadContext;
+#else
+typedef struct {
+    CpuRegister cpu_gprs[29];   ///< GPRs 0..28. Note: also contains AArch32 SPRs.
+    u32 fp;                     ///< Frame pointer (x29) (AArch64). For AArch32, check r11.
+    u32 lr;                     ///< Link register (x30) (AArch64). For AArch32, check r14.
+    u32 sp;                     ///< Stack pointer (AArch64). For AArch32, check r13.
+    CpuRegister pc;             ///< Program counter.
+    u32         psr;            ///< PSTATE or cpsr.
+
+    FpuRegister fpu_gprs[32];   ///< 32 general-purpose NEON registers.
+    u32         fpcr;           ///< Floating-point control register.
+    u32         fpsr;           ///< Floating-point status register.
+
+    u32         tpidr;          ///< EL0 Read/Write Software Thread ID Register.
+} ThreadContext;
+#endif
 
 /// Thread exception dump structure.
 typedef struct {

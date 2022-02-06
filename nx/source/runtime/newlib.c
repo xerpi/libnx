@@ -22,6 +22,15 @@
 
 #define THRD_MAIN_HANDLE ((struct __pthread_t*)~(uintptr_t)0)
 
+#ifndef __ARM_ARCH_ISA_A64
+typedef uint32_t _COND_T;
+
+static inline uint64_t timespec2nsec(const struct timespec *timespec)
+{
+    return (timespec->tv_sec * (uint64_t)1000000000ull) + timespec->tv_nsec;
+}
+#endif
+
 struct __pthread_t
 {
     Thread thr;

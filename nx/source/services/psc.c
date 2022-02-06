@@ -44,8 +44,6 @@ Result pscmGetPmModule(PscPmModule *out, PscPmModuleId module_id, const u32 *dep
 }
 
 Result _pscPmModuleInitialize(PscPmModule *module, PscPmModuleId module_id, const u32 *dependencies, size_t dependency_count, bool autoclear) {
-    _Static_assert(sizeof(module_id) == sizeof(u32), "PscPmModuleId size");
-
     Handle evt_handle = INVALID_HANDLE;
     serviceAssumeDomain(&module->srv);
     Result rc = serviceDispatchIn(&module->srv, 0, module_id,
@@ -84,7 +82,6 @@ Result pscPmModuleAcknowledge(PscPmModule *module, PscPmState state) {
     serviceAssumeDomain(&module->srv);
 
     if (hosversionAtLeast(5,1,0)) {
-        _Static_assert(sizeof(state) == sizeof(u32), "PscPmState size");
         return serviceDispatchIn(&module->srv, 4, state);
     } else {
         return serviceDispatch(&module->srv, 2);

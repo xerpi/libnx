@@ -81,7 +81,7 @@ Result usbDsParseReportData(UsbDsReportData *reportdata, u32 urbId, u32 *request
 Event* usbDsGetStateChangeEvent(void);
 
 /// Gets the device state. See \ref UsbState.
-Result usbDsGetState(UsbState* out);
+Result usbDsGetState(/*UsbState*/ u32 *out);
 
 /// Removed in [5.0.0+].
 Result usbDsGetDsInterface(UsbDsInterface** out, struct usb_interface_descriptor* descriptor, const char* interface_name);

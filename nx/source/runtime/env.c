@@ -56,12 +56,12 @@ void envSetup(void* ctx, Handle main_thread, LoaderReturnFn saved_lr)
             break;
 
         case EntryType_NextLoadPath:
-            g_nextLoadPath = (char*) ent->Value[0];
-            g_nextLoadArgv = (char*) ent->Value[1];
+            g_nextLoadPath = (char*)(uintptr_t) ent->Value[0];
+            g_nextLoadArgv = (char*)(uintptr_t) ent->Value[1];
             break;
 
         case EntryType_OverrideHeap:
-            g_overrideHeapAddr = (void*) ent->Value[0];
+            g_overrideHeapAddr = (void*)(uintptr_t) ent->Value[0];
             g_overrideHeapSize = ent->Value[1];
             break;
 
@@ -70,7 +70,7 @@ void envSetup(void* ctx, Handle main_thread, LoaderReturnFn saved_lr)
             break;
 
         case EntryType_Argv:
-            g_overrideArgv = (void*) ent->Value[1];
+            g_overrideArgv = (void*)(uintptr_t) ent->Value[1];
             break;
 
         case EntryType_SyscallAvailableHint:

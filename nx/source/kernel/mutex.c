@@ -6,6 +6,7 @@
 
 #define HANDLE_WAIT_MASK 0x40000000u
 
+#define dmb()          __asm__ __volatile__ ("dmb " : : : "memory")
 #define LIKELY(expr)   (__builtin_expect_with_probability(!!(expr), 1, 1.0))
 #define UNLIKELY(expr) (__builtin_expect_with_probability(!!(expr), 0, 1.0))
 
@@ -13,16 +14,24 @@ NX_INLINE u32 _GetTag(void) {
     return getThreadVars()->handle;
 }
 
-NX_INLINE u32 _LoadExclusive(u32 *ptr) {
+NX_INLINE u32 _LoadExclusive(Mutex *ptr) {
     u32 value;
+#ifdef __ARM_ARCH_ISA_A64
     __asm__ __volatile__("ldaxr %w[value], %[ptr]" : [value]"=&r"(value) : [ptr]"Q"(*ptr) : "memory");
+#else
+    __asm__ __volatile__("ldrex %r[value], %[ptr]" : [value]"=&r"(value) : [ptr]"Q"(*ptr) : "memory");
+#endif
     return value;
 }
 
-NX_INLINE int _StoreExclusive(u32 *ptr, u32 value) {
-    int result;
+NX_INLINE bool _StoreExclusive(Mutex *ptr, u32 value) {
+    u32 result;
+#ifdef __ARM_ARCH_ISA_A64
     __asm__ __volatile__("stlxr %w[result], %w[value], %[ptr]" : [result]"=&r"(result) : [value]"r"(value), [ptr]"Q"(*ptr) : "memory");
-    return result;
+#else
+    __asm__ __volatile__("strex %r[result], %r[value], %[ptr]" : [result]"=&r"(result) : [value]"r"(value), [ptr]"Q"(*ptr) : "memory");
+#endif
+    return result != 0;
 }
 
 NX_INLINE void _ClearExclusive(void) {
@@ -55,7 +64,7 @@ void mutexLock(Mutex* m) {
         }
 
         // Ask the kernel to arbitrate the lock for us.
-        if (UNLIKELY(R_FAILED(svcArbitrateLock(value & ~HANDLE_WAIT_MASK, m, cur_handle)))) {
+        if (UNLIKELY(R_FAILED(svcArbitrateLock(value & ~HANDLE_WAIT_MASK, (u32*)m, cur_handle)))) {
             // This should be impossible under normal circumstances.
             svcBreak(BreakReason_Assert, 0, 0);
         }
@@ -68,7 +77,9 @@ void mutexLock(Mutex* m) {
         }
     }
 
-    // __dmb(); // Done only in aarch32 mode.
+#ifndef __ARM_ARCH_ISA_A64
+    dmb(); // Done only in aarch32 mode.
+#endif
 }
 
 bool mutexTryLock(Mutex* m) {
@@ -82,7 +93,9 @@ bool mutexTryLock(Mutex* m) {
             break;
         }
 
-        // __dmb(); // Done only in aarch32 mode.
+#ifndef __ARM_ARCH_ISA_A64
+        dmb(); // Done only in aarch32 mode.
+#endif
 
         if (LIKELY(_StoreExclusive(m, cur_handle) == 0)) {
             return true;
@@ -92,7 +105,9 @@ bool mutexTryLock(Mutex* m) {
     // Release our exclusive hold.
     _ClearExclusive();
 
-    // __dmb(); // Done only in aarch32 mode.
+#ifndef __ARM_ARCH_ISA_A64
+    dmb(); // Done only in aarch32 mode.
+#endif
 
     return false;
 }
@@ -109,7 +124,9 @@ void mutexUnlock(Mutex* m) {
             break;
         }
 
-        // __dmb(); // Done only in aarch32 mode.
+#ifndef __ARM_ARCH_ISA_A64
+        dmb(); // Done only in aarch32 mode.
+#endif
 
         // Try to release the lock.
         if (LIKELY(_StoreExclusive(m, INVALID_HANDLE) == 0)) {
@@ -120,11 +137,13 @@ void mutexUnlock(Mutex* m) {
         value = _LoadExclusive(m);
     }
 
-    // __dmb(); // Done only in aarch32 mode.
+#ifndef __ARM_ARCH_ISA_A64
+    dmb(); // Done only in aarch32 mode.
+#endif
 
     if (value & HANDLE_WAIT_MASK) {
         // Ask the kernel to arbitrate unlock for us.
-        if (UNLIKELY(R_FAILED(svcArbitrateUnlock(m)))) {
+        if (UNLIKELY(R_FAILED(svcArbitrateUnlock((u32*)m)))) {
             // This should be impossible under normal circumstances.
             svcBreak(BreakReason_Assert, 0, 0);
         }

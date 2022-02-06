@@ -1173,7 +1173,7 @@ Result appletOverrideAutoSleepTimeAndDimmingTime(s32 inval0, s32 inval1, s32 inv
 }
 
 IPC_MAKE_CMD_IMPL(       Result appletSetIdleTimeDetectionExtension(AppletIdleTimeDetectionExtension ext),  &g_appletISelfController, 62, _appletCmdInU32NoOut,         ext)
-IPC_MAKE_CMD_IMPL(       Result appletGetIdleTimeDetectionExtension(AppletIdleTimeDetectionExtension *ext), &g_appletISelfController, 63, _appletCmdNoInOutU32,         ext)
+IPC_MAKE_CMD_IMPL(       Result appletGetIdleTimeDetectionExtension(/*AppletIdleTimeDetectionExtension*/ u32 *ext), &g_appletISelfController, 63, _appletCmdNoInOutU32,         ext)
 IPC_MAKE_CMD_IMPL(       Result appletSetInputDetectionSourceSet(u32 val),                                  &g_appletISelfController, 64, _appletCmdInU32NoOut,         val)
 IPC_MAKE_CMD_IMPL_HOSVER(Result appletReportUserIsActive(void),                                             &g_appletISelfController, 65, _appletCmdNoIO,       (2,0,0))
 
@@ -1700,7 +1700,7 @@ bool appletHolderCheckFinished(AppletHolder *h) {
     return R_SUCCEEDED(eventWait(&h->StateChangedEvent, 0));
 }
 
-u32 appletHolderGetExitReason(AppletHolder *h) {
+LibAppletExitReason appletHolderGetExitReason(AppletHolder *h) {
     return h->exitreason;
 }
 

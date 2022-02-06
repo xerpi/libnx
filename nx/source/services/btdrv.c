@@ -349,7 +349,7 @@ Result btdrvRespondToSspRequest(BtdrvAddress addr, u32 variant, bool accept, u32
     }
 }
 
-Result btdrvGetEventInfo(void* buffer, size_t size, BtdrvEventType *type) {
+Result btdrvGetEventInfo(void* buffer, size_t size, /*BtdrvEventType*/ u32 *type) {
     return _btdrvCmdOutU32OutBuf(buffer, size, type, 15);
 }
 
@@ -975,7 +975,7 @@ Result btdrvAddGattDescriptor(u8 unk0, const BtdrvGattAttributeUuid *uuid0, cons
     return serviceDispatchIn(&g_btdrvSrv, cmd_id, in);
 }
 
-Result btdrvGetBleManagedEventInfo(void* buffer, size_t size, BtdrvBleEventType *type) {
+Result btdrvGetBleManagedEventInfo(void* buffer, size_t size, /*BtdrvBleEventType*/ u32 *type) {
     if (hosversionBefore(5,0,0))
         return MAKERESULT(Module_Libnx, LibnxError_IncompatSysVer);
     u32 cmd_id = hosversionBefore(5,1,0) ? 78 : 79;
@@ -1208,7 +1208,7 @@ Result btdrvUnregisterGattNotification(u32 connection_handle, bool primary_servi
     return _btdrvGattNotification(connection_handle, primary_service, id0, id1, cmd_id);
 }
 
-Result btdrvGetLeHidEventInfo(void* buffer, size_t size, BtdrvBleEventType *type) {
+Result btdrvGetLeHidEventInfo(void* buffer, size_t size, /*BtdrvBleEventType*/ u32 *type) {
     if (hosversionBefore(5,0,0))
         return MAKERESULT(Module_Libnx, LibnxError_IncompatSysVer);
     u32 cmd_id = hosversionBefore(5,1,0) ? 95 : 96;

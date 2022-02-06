@@ -62,18 +62,18 @@ Result jitCreate(Jit* j, size_t size)
         {
             virtmemLock();
             j->rw_addr = virtmemFindCodeMemory(j->size, 0x1000);
-            rc = svcControlCodeMemory(j->handle, CodeMapOperation_MapOwner, j->rw_addr, j->size, Perm_Rw);
+            rc = svcControlCodeMemory(j->handle, CodeMapOperation_MapOwner, (u64)(uintptr_t)j->rw_addr, j->size, Perm_Rw);
             virtmemUnlock();
 
             if (R_SUCCEEDED(rc))
             {
                 virtmemLock();
                 j->rx_addr = virtmemFindCodeMemory(j->size, 0x1000);
-                rc = svcControlCodeMemory(j->handle, CodeMapOperation_MapSlave, j->rx_addr, j->size, Perm_Rx);
+                rc = svcControlCodeMemory(j->handle, CodeMapOperation_MapSlave, (u64)(uintptr_t)j->rx_addr, j->size, Perm_Rx);
                 virtmemUnlock();
 
                 if (R_FAILED(rc)) {
-                    svcControlCodeMemory(j->handle, CodeMapOperation_UnmapOwner, j->rw_addr, j->size, 0);
+                    svcControlCodeMemory(j->handle, CodeMapOperation_UnmapOwner, (u64)(uintptr_t)j->rw_addr, j->size, 0);
                 }
             }
 
@@ -104,7 +104,7 @@ Result jitTransitionToWritable(Jit* j)
 
     switch (j->type) {
     case JitType_SetProcessMemoryPermission:
-        if (j->is_executable) rc = svcUnmapProcessCodeMemory(envGetOwnProcessHandle(), (u64) j->rx_addr, (u64) j->src_addr, j->size);
+        if (j->is_executable) rc = svcUnmapProcessCodeMemory(envGetOwnProcessHandle(), (uintptr_t) j->rx_addr, (u64)(uintptr_t) j->src_addr, j->size);
         break;
 
     case JitType_CodeMemory:
@@ -124,10 +124,10 @@ Result jitTransitionToExecutable(Jit* j)
     switch (j->type) {
     case JitType_SetProcessMemoryPermission:
         if (!j->is_executable) {
-            rc = svcMapProcessCodeMemory(envGetOwnProcessHandle(), (u64) j->rx_addr, (u64) j->src_addr, j->size);
+            rc = svcMapProcessCodeMemory(envGetOwnProcessHandle(), (uintptr_t) j->rx_addr, (u64)(uintptr_t) j->src_addr, j->size);
 
             if (R_SUCCEEDED(rc)) {
-                rc = svcSetProcessMemoryPermission(envGetOwnProcessHandle(), (u64) j->rx_addr, j->size, Perm_Rx);
+                rc = svcSetProcessMemoryPermission(envGetOwnProcessHandle(), (u64)(uintptr_t) j->rx_addr, j->size, Perm_Rx);
 
                 if (R_FAILED(rc)) {
                     jitTransitionToWritable(j);
@@ -164,10 +164,10 @@ Result jitClose(Jit* j)
         break;
 
     case JitType_CodeMemory:
-        rc = svcControlCodeMemory(j->handle, CodeMapOperation_UnmapOwner, j->rw_addr, j->size, 0);
+        rc = svcControlCodeMemory(j->handle, CodeMapOperation_UnmapOwner, (u64)(uintptr_t)j->rw_addr, j->size, 0);
 
         if (R_SUCCEEDED(rc)) {
-            rc = svcControlCodeMemory(j->handle, CodeMapOperation_UnmapSlave, j->rx_addr, j->size, 0);
+            rc = svcControlCodeMemory(j->handle, CodeMapOperation_UnmapSlave, (u64)(uintptr_t)j->rx_addr, j->size, 0);
 
             if (R_SUCCEEDED(rc)) {
                 svcCloseHandle(j->handle);

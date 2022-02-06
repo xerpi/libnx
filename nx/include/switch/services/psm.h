@@ -39,7 +39,7 @@ void psmExit(void);
 Service* psmGetServiceSession(void);
 
 Result psmGetBatteryChargePercentage(u32 *out);
-Result psmGetChargerType(PsmChargerType *out);
+Result psmGetChargerType(/*PsmChargerType*/ u32 *out);
 Result psmGetBatteryVoltageState(PsmBatteryVoltageState *out);
 Result psmGetRawBatteryChargePercentage(double *out);
 Result psmIsEnoughPowerSupplied(bool *out);

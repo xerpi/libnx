@@ -222,6 +222,7 @@ typedef enum {
     HidNpadIdType_No8      = 7,    ///< Player 8 controller
     HidNpadIdType_Other    = 0x10, ///< Other controller
     HidNpadIdType_Handheld = 0x20, ///< Handheld mode controls
+    __HidNpadIdType_FORCE_SIZE = 0x7fffffffu,
 } HidNpadIdType;
 
 /// HID controller styles

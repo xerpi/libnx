@@ -46,7 +46,7 @@ typedef enum {
 
 /// ProcessEventInfo
 typedef struct {
-    PmProcessEvent event;
+    /*PmProcessEvent*/ u32 event;
     u64 process_id;
 } PmProcessEventInfo;
 
@@ -97,7 +97,7 @@ Service* pmbmGetServiceSession(void);
  * @brief Gets the \ref PmBootMode.
  * @param[out] out \ref PmBootMode
  */
-Result pmbmGetBootMode(PmBootMode *out);
+Result pmbmGetBootMode(/*PmBootMode*/ u32 *out);
 
 /**
  * @brief Sets the \ref PmBootMode to ::PmBootMode_Maintenance.

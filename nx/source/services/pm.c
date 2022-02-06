@@ -28,8 +28,7 @@ PM_GENERATE_SERVICE_INIT(bm);
 
 // pmbm
 
-Result pmbmGetBootMode(PmBootMode *out) {
-    _Static_assert(sizeof(*out) == sizeof(u32), "PmBootMode");
+Result pmbmGetBootMode(/*PmBootMode*/ u32 *out) {
     return serviceDispatchOut(&g_pmbmSrv, 0, *out);
 }
 

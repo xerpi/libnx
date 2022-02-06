@@ -17,7 +17,7 @@ typedef enum {
 } MmuModuleId;
 
 typedef struct {
-    MmuModuleId module;
+    /*MmuModuleId*/ u32 module;
     u32         id;
 } MmuRequest;
 
