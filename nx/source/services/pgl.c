@@ -177,7 +177,6 @@ Result pglEnableApplicationAllThreadDumpOnCrash(bool en) {
 Result pglTriggerApplicationSnapShotDumper(PglSnapShotDumpType dump_type, const char *arg) {
     if (hosversionAtLeast(12,0,0)) return MAKERESULT(Module_Libnx, LibnxError_IncompatSysVer);
 
-    _Static_assert(sizeof(dump_type) == sizeof(u32), "PglSnapShotDumpType");
     return serviceDispatchIn(&g_pglSrv.cmif, 12, dump_type,
         .buffer_attrs = { SfBufferAttr_In | SfBufferAttr_HipcMapAlias },
         .buffers = { { arg, strlen(arg) + 1 } },

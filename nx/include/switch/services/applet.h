@@ -837,7 +837,7 @@ Result appletSetIdleTimeDetectionExtension(AppletIdleTimeDetectionExtension ext)
  * @brief Gets the value set by \ref appletSetIdleTimeDetectionExtension.
  * @param[out] ext \ref AppletIdleTimeDetectionExtension
  */
-Result appletGetIdleTimeDetectionExtension(AppletIdleTimeDetectionExtension *ext);
+Result appletGetIdleTimeDetectionExtension(/*AppletIdleTimeDetectionExtension*/ u32 *ext);
 
 /**
  * @brief Sets the InputDetectionSourceSet.

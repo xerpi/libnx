@@ -570,7 +570,7 @@ Result btdrvRespondToSspRequest(BtdrvAddress addr, u32 variant, bool accept, u32
  * @param[in] size Output buffer size.
  * @param[out] type Output BtdrvEventType.
  */
-Result btdrvGetEventInfo(void* buffer, size_t size, BtdrvEventType *type);
+Result btdrvGetEventInfo(void* buffer, size_t size, /*BtdrvEventType*/ u32 *type);
 
 /**
  * @brief InitializeHid
@@ -1092,7 +1092,7 @@ Result btdrvAddGattDescriptor(u8 unk0, const BtdrvGattAttributeUuid *uuid0, cons
  * @param[in] size Output buffer size.
  * @oaram[out] type Output BtdrvBleEventType.
  */
-Result btdrvGetBleManagedEventInfo(void* buffer, size_t size, BtdrvBleEventType *type);
+Result btdrvGetBleManagedEventInfo(void* buffer, size_t size, /*BtdrvBleEventType*/ u32 *type);
 
 /**
  * @brief GetGattFirstCharacteristic

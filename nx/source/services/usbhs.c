@@ -288,7 +288,7 @@ static Result _usbHsIfCtrlXferAsync(UsbHsClientIfSession* s, u8 bmRequestType, u
         u16 wIndex;
         u16 wLength;
         u64 buffer;
-    } in = { bmRequestType, bRequest, wValue, wIndex, wLength, (u64)buffer };
+    } in = { bmRequestType, bRequest, wValue, wIndex, wLength, (u64)(uintptr_t)buffer };
 
     serviceAssumeDomain(&s->s);
     return serviceDispatchIn(&s->s, 5, in);
@@ -404,7 +404,7 @@ static Result _usbHsEpPostBufferAsync(UsbHsClientEpSession* s, void* buffer, u32
         u32 pad;
         u64 buffer;
         u64 unk;
-    } in = { size, 0, (u64)buffer, unk };
+    } in = { size, 0, (u64)(uintptr_t)buffer, unk };
 
     serviceAssumeDomain(&s->s);
     return serviceDispatchInOut(&s->s, 4, in, *xferId);

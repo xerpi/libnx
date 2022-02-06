@@ -55,7 +55,6 @@ static Result _gpioCmdInU32OutBool(Service *srv, bool *out_value, u32 inval, u32
 }
 
 Result gpioOpenSession(GpioPadSession *out, GpioPadName name) {
-    _Static_assert(sizeof(name) == sizeof(u32), "GpioPadName size");
     return serviceDispatchIn(&g_gpioSrv, 1, name,
         .out_num_objects = 1,
         .out_objects = &out->s,
@@ -83,7 +82,6 @@ Result gpioIsWakeEventActive(bool *out, GpioPadName name) {
         return MAKERESULT(Module_Libnx, LibnxError_IncompatSysVer);
     }
 
-    _Static_assert(sizeof(name) == sizeof(u32), "GpioPadName size");
     return _gpioCmdInU32OutBool(&g_gpioSrv, out, name, 3);
 }
 
@@ -99,18 +97,16 @@ Result gpioPadSetDirection(GpioPadSession *p, GpioDirection dir) {
     return _gpioCmdInU32NoOut(&p->s, dir, 0);
 }
 
-Result gpioPadGetDirection(GpioPadSession *p, GpioDirection *out) {
-    _Static_assert(sizeof(*out) == sizeof(u32), "GpioDirection size");
-    return _gpioCmdNoInOutU32(&p->s, (u32 *)out, 1);
+Result gpioPadGetDirection(GpioPadSession *p, /*GpioDirection*/ u32 *out) {
+    return _gpioCmdNoInOutU32(&p->s, out, 1);
 }
 
 Result gpioPadSetInterruptMode(GpioPadSession *p, GpioInterruptMode mode) {
     return _gpioCmdInU32NoOut(&p->s, mode, 2);
 }
 
-Result gpioPadGetInterruptMode(GpioPadSession *p, GpioInterruptMode *out) {
-    _Static_assert(sizeof(*out) == sizeof(u32), "GpioInterruptMode size");
-    return _gpioCmdNoInOutU32(&p->s, (u32 *)out, 3);
+Result gpioPadGetInterruptMode(GpioPadSession *p, /*GpioInterruptMode*/ u32 *out) {
+    return _gpioCmdNoInOutU32(&p->s, out, 3);
 }
 
 Result gpioPadSetInterruptEnable(GpioPadSession *p, bool en) {
@@ -121,9 +117,8 @@ Result gpioPadGetInterruptEnable(GpioPadSession *p, bool *out) {
     return _gpioCmdNoInOutBool(&p->s, out, 5);
 }
 
-Result gpioPadGetInterruptStatus(GpioPadSession *p, GpioInterruptStatus *out) {
-    _Static_assert(sizeof(*out) == sizeof(u32), "GpioInterruptStatus size");
-    return _gpioCmdNoInOutU32(&p->s, (u32 *)out, 6);
+Result gpioPadGetInterruptStatus(GpioPadSession *p, /*GpioInterruptStatus*/ u32 *out) {
+    return _gpioCmdNoInOutU32(&p->s, out, 6);
 }
 
 Result gpioPadClearInterruptStatus(GpioPadSession *p) {
@@ -135,9 +130,8 @@ Result gpioPadSetValue(GpioPadSession *p, GpioValue val) {
     return _gpioCmdInU32NoOut(&p->s, val, 8);
 }
 
-Result gpioPadGetValue(GpioPadSession *p, GpioValue *out) {
-    _Static_assert(sizeof(*out) == sizeof(u32), "GpioValue size");
-    return _gpioCmdNoInOutU32(&p->s, (u32 *)out, 9);
+Result gpioPadGetValue(GpioPadSession *p, /*GpioValue*/ u32 *out) {
+    return _gpioCmdNoInOutU32(&p->s, out, 9);
 }
 
 Result gpioPadBindInterrupt(GpioPadSession *p, Event *out) {

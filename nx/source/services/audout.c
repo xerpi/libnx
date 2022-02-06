@@ -195,8 +195,7 @@ Result audoutStopAudioOut(void) {
 
 Result audoutAppendAudioOutBuffer(AudioOutBuffer *Buffer) {
     bool new_cmd = hosversionAtLeast(3,0,0);
-    u64 tmp = (u64)Buffer;
-    return serviceDispatchIn(&g_audoutIAudioOut, new_cmd==0 ? 3 : 7, tmp,
+    return serviceDispatchIn(&g_audoutIAudioOut, new_cmd==0 ? 3 : 7, Buffer,
         .buffer_attrs = { (new_cmd==0 ? SfBufferAttr_HipcMapAlias : SfBufferAttr_HipcAutoSelect) | SfBufferAttr_In },
         .buffers = { { Buffer, sizeof(*Buffer) } },
     );
@@ -215,9 +214,8 @@ Result audoutGetReleasedAudioOutBuffer(AudioOutBuffer **Buffer, u32 *ReleasedBuf
 }
 
 Result audoutContainsAudioOutBuffer(AudioOutBuffer *Buffer, bool *ContainsBuffer) {
-    u64 tmp = (u64)Buffer;
     u8 out=0;
-    Result rc = serviceDispatchInOut(&g_audoutIAudioOut, 6, tmp, out);
+    Result rc = serviceDispatchInOut(&g_audoutIAudioOut, 6, Buffer, out);
     if (R_SUCCEEDED(rc) && ContainsBuffer) *ContainsBuffer = out & 1;
     return rc;
 }

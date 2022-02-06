@@ -28,7 +28,7 @@ void padConfigureInput(u32 max_players, u32 style_set) {
 void padInitializeWithMask(PadState* pad, u64 mask) {
     memset(pad, 0, sizeof(*pad));
     pad->id_mask = mask & 0xff;
-    pad->read_handheld = (mask & (1UL << HidNpadIdType_Handheld)) != 0;
+    pad->read_handheld = (mask & BITL(HidNpadIdType_Handheld)) != 0;
 }
 
 static void _padUpdateWithCommonState(PadState* pad, const HidNpadCommonState* state) {

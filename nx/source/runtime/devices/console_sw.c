@@ -132,6 +132,7 @@ static void ConsoleSwRenderer_drawChar(PrintConsole* con, int x, int y, int c)
         bg = tmp;
     }
 
+#ifdef __ARM_ARCH_ISA_A64
     u128 *tmp = (u128*)fontdata;
 
     u128 bvaltop = tmp[0];
@@ -162,6 +163,48 @@ static void ConsoleSwRenderer_drawChar(PrintConsole* con, int x, int y, int c)
         }
         mask >>= 1;
     }
+#else
+    u64 *tmp = (u64*)fontdata;
+
+    u64 bvaltoplo = tmp[0];
+    u64 bvaltophi = tmp[1];
+    u64 bvalbtmlo = tmp[2];
+    u64 bvalbtmhi = tmp[3];
+
+    if (con->flags & CONSOLE_UNDERLINE)  bvalbtmhi |= (u64)0xffffULL << 3*16;
+
+    if (con->flags & CONSOLE_CROSSED_OUT) bvaltophi |= (u64)0xffffULL << 3*16;
+
+    u16 mask = 0x8000;
+
+    int i, j;
+
+    x *= 16;
+    y *= 16;
+
+    u16 *screen;
+
+    for (i=0;i<16;i++) {
+        for (j=0;j<4;j++) {
+            uint32_t screenOffset = (x + i) + stride*(y + j);
+            screen = &frameBuffer[screenOffset];
+            if (bvaltoplo >> (16*j) & mask) { *screen = fg; }else{ *screen = bg; }
+
+            screenOffset = (x + i) + stride*(y + j + 4);
+            screen = &frameBuffer[screenOffset];
+            if (bvaltophi >> (16*j) & mask) { *screen = fg; }else{ *screen = bg; }
+
+            screenOffset = (x + i) + stride*(y + j + 8);
+            screen = &frameBuffer[screenOffset];
+            if (bvalbtmlo >> (16*j) & mask) { *screen = fg; }else{ *screen = bg; }
+
+            screenOffset = (x + i) + stride*(y + j + 12);
+            screen = &frameBuffer[screenOffset];
+            if (bvalbtmhi >> (16*j) & mask) { *screen = fg; }else{ *screen = bg; }
+        }
+        mask >>= 1;
+    }
+#endif
 }
 
 static void ConsoleSwRenderer_scrollWindow(PrintConsole* con)
@@ -175,6 +218,7 @@ static void ConsoleSwRenderer_scrollWindow(PrintConsole* con)
     x = con->windowX * 16;
     y = con->windowY * 16;
 
+#ifdef __ARM_ARCH_ISA_A64
     for (i=0; i<con->windowWidth*16; i+=sizeof(u128)/sizeof(u16)) {
         u128 *from;
         u128 *to;
@@ -184,6 +228,17 @@ static void ConsoleSwRenderer_scrollWindow(PrintConsole* con)
             *to = *from;
         }
     }
+#else
+    for (i=0; i<con->windowWidth*16; i+=sizeof(u64)/sizeof(u16)) {
+        u64 *from;
+        u64 *to;
+        for (j=0;j<(con->windowHeight-1)*16;j++) {
+            to = (u64*)&frameBuffer[(x + i) + stride*(y + j)];
+            from = (u64*)&frameBuffer[(x + i) + stride*(y + 16 + j)];
+            *to = *from;
+        }
+    }
+#endif
 }
 
 static void ConsoleSwRenderer_flushAndSwap(PrintConsole* con)

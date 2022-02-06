@@ -49,7 +49,7 @@ void padConfigureInput(u32 max_players, u32 style_set);
     const HidNpadIdType _pad_ids[] = { __VA_ARGS__ }; \
     u64 _pad_mask = 0; \
     for (unsigned _pad_i = 0; _pad_i < (sizeof(_pad_ids)/sizeof(_pad_ids[0])); ++_pad_i) \
-        _pad_mask |= 1UL << (_pad_ids[_pad_i]); \
+        _pad_mask |= BITL(_pad_ids[_pad_i]); \
     padInitializeWithMask((_pad), _pad_mask); \
 })
 

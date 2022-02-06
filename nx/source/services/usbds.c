@@ -224,14 +224,13 @@ static Result _usbDsBindDevice(UsbComplexId complexId, Handle prochandle) {
     return rc;
 }
 
-Result usbDsGetState(UsbState *out) {
-    _Static_assert(sizeof(*out) == sizeof(u32));
-    return _usbDsCmdNoInOutU32(&g_usbDsSrv, (u32 *)out, hosversionAtLeast(11,0,0) ? 3 : 4);
+Result usbDsGetState(/*UsbState*/ u32 *out) {
+    return _usbDsCmdNoInOutU32(&g_usbDsSrv, out, hosversionAtLeast(11,0,0) ? 3 : 4);
 }
 
 Result usbDsWaitReady(u64 timeout) {
     Result rc;
-    UsbState state = UsbState_Detached;
+    u32 state = UsbState_Detached;
 
     rc = usbDsGetState(&state);
     if (R_FAILED(rc)) return rc;
@@ -314,7 +313,7 @@ static Result _usbDsPostBuffer(Service* srv, void* buffer, size_t size, u32 *urb
         u32 size;
         u32 padding;
         u64 buffer;
-    } in = { (u32)size, 0, (u64)buffer };
+    } in = { (u32)size, 0, (u64)(uintptr_t)buffer };
 
     serviceAssumeDomain(srv);
     return serviceDispatchInOut(srv, cmd_id, in, *urbId);
